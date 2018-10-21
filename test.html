@@ -1,0 +1,33 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var stu = {
+        name: "冷荣富",
+        age: 22,
+        sex: "男"
+      };
+      $.ajax({
+        type: "POST",
+        url: "/wx_api.php?type=regesit",
+        data: JSON.stringify(stu),
+        contentType: "application/json;charset=utf-8;",
+        dataType: "json",
+        complete: function (msg) {
+          $("p").html("submitted" + str(msg));
+        }
+      });
+      $("p").click(function () {
+        $(this).hide();
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <p>If you click on me, I will disappear.</p>
+</body>
+
+</html>
