@@ -20,6 +20,7 @@
 
     > **response** 
     > - {status:"expired session";} #Session过期，需要重新登入。
-    > - {status:"invalid session";} #非法Session。如果遇到这个，报错给我
+    > - {status:"invalid session";} #非法Session。如果遇到这个超出预期的错误，报错给我
+    > - {status:"user does not exist";} #不存在的用户，如果遇到这个超出预期的错误，报错给我
     > - {status:"ok";} #验证成功
 

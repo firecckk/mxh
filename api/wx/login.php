@@ -10,28 +10,31 @@ switch ($_GET['type']) {
         loginBySession($_GET['session']);
         break;
 }
-
+/**
+ * Login By Code
+ * 
+ */
 function loginByCode($code, $encryptedData, $iv)
 {
     //获取Session_key 和 open_id
     $info = getInfoFromWXServer(configs::$APPID, configs::$APPSECRET, configs::$code);
     $json = json_decode($info);
     $arr = get_object_vars($json);
-    if(!array_key_exists("openid",$arr)){
+    if (!array_key_exists("openid", $arr)) {
         die($info);
     }
     $openid = $arr['openid'];
     $session_key = $arr['session_key'];
     $nick_name;
 
-    $return_msg=[];
+    $return_msg = [];
 
     //解密encryptData 得到 union_id
     $pc = new WXBizDataCrypt($appid, $sessionKey);
     $errCode = $pc->decryptData($encryptedData, $iv, $data);
     if ($errCode == 0) {
         print($data . "\n");
-        $j= json_decode($data);
+        $j = json_decode($data);
         $a = get_object_vars($json);
         $nick_name = $a["nickName"];
     } else {
@@ -41,7 +44,7 @@ function loginByCode($code, $encryptedData, $iv)
     //查看用户是否存在
     $um = Env::get_um();
     $userid = $um->isUserExistByOpenId($openid);
-    if($userid == false){
+    if ($userid == false) {
         //注册用户
         $userid = $um->addUser(0, $openid, $nick_name);
         $return_msg["userType"] = "new";
@@ -55,19 +58,30 @@ function loginByCode($code, $encryptedData, $iv)
     $return_msg["mySession"] = $mysession;
 
     //返回json
-    echo(json_encode($return_msg));
+    echo (json_encode($return_msg));
 }
 
+/**
+ * Login By Session
+ * 
+ */
 function loginBySession($session)
 {
+    $um = Env::get_um();
+    $sm = Env::get_sm();
     $return_msg = [];
-    $ck = checkSession();
-    if( $ck == "expired"){
+
+    $ck = $sm->checkSession();
+    if ($ck == "expired") {
         $return_msg["status"] = "expired session";
-    } else if( $ck == "invalid"){
+    } else if ($ck == "invalid") {
         $return_msg["status"] = "invalid session";
     } else {
-        $return_msg["status"] = "ok";
+        if ($um->isUserExistById($ck) == false) {
+            $return_msg["status"] = "user does not exist";
+        } else {
+            $return_msg["status"] = "ok";
+        }
     }
     echo $APPID;
 }
